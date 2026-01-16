@@ -27,9 +27,6 @@
       ],
       "@lib/shared/*": [
         "libs/shared/src/*"
-      ],
-      "@en/config": [
-        "../packages/config/index.ts"
       ]
     }
   }

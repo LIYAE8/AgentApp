@@ -5,9 +5,7 @@
   "main": "index.js",
   "type":"module",
   "exports":{
-    ".":{
-      ".":"./index.ts"
-    }
+    ".":"./index.ts"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

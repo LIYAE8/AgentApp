@@ -6,6 +6,6 @@ export class AppService {
 
   }
   getHello(): string {
-    return this.prisma.getHello()
+    return 'testAPP'
   }
 }

@@ -12,8 +12,9 @@ export class UserService {
     return 'This action adds a new user';
   }
 
-  findAll() {
-    const test = this.prisma.getHello()
+  async findAll(): Promise<any> {
+    // console.log(this.prisma)
+    const test = await this.prisma.user.findMany()
     return this.response.success(test)
   }
 
