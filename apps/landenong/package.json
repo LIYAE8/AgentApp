@@ -1,5 +1,5 @@
 {
-  "name": "@en/web",
+  "name": "@en/web-1",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,6 +15,7 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@en/common": "workspace:*",
     "@en/config": "workspace:*",
     "pinia": "^3.0.4",
     "vue": "^3.5.26",
