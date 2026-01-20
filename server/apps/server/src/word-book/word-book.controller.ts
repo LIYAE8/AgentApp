@@ -1,10 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { WordBookService } from './word-book.service';
 import type { WordQuery } from '@en/common/word';
-
 @Controller('word-book')
 export class WordBookController {
-  constructor(private readonly wordBookService: WordBookService) {}
+  constructor(private readonly wordBookService: WordBookService) { }
 
   // @Post()
   // create(@Body() body: { word: string }) {
@@ -12,8 +11,8 @@ export class WordBookController {
   // }
 
   @Get()
-  findAll(@Query() query:WordQuery) {
-    return this.wordBookService.findAll(query);
+  async findAll(@Query() query: WordQuery) {
+    this.wordBookService.findAll(query)
   }
 
   // @Get(':id')
