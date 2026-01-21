@@ -12,7 +12,7 @@ export class WordBookController {
 
   @Get()
   async findAll(@Query() query: WordQuery) {
-    this.wordBookService.findAll(query)
+    return this.wordBookService.findAll(query);
   }
 
   // @Get(':id')

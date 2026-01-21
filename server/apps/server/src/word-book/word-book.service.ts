@@ -17,7 +17,7 @@ export class WordBookService {
   }
 
   async findAll(query: WordQuery) {
-    const { pageSize, page } = query
+    const { pageSize, page, ...rest} = query
     //整理参数，数值转换
     const tags = Object.fromEntries(Object.entries(query).map(([key, value]) => [key, this.toBoolean(value)]))
     const where: Prisma.WordBookWhereInput = {
@@ -29,7 +29,7 @@ export class WordBookService {
     const [total, list] = await Promise.all([
       this.prisma.wordBook.count({ where }),
       this.prisma.wordBook.findMany({
-        where,
+        where,  
         skip: (Number(page - 1)) * Number(pageSize),
         take: Number(pageSize),
         orderBy: {
