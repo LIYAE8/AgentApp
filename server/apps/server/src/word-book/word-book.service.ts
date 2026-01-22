@@ -17,26 +17,47 @@ export class WordBookService {
   }
 
   async findAll(query: WordQuery) {
-    const { pageSize, page, ...rest} = query
-    //整理参数，数值转换
-    const tags = Object.fromEntries(Object.entries(query).map(([key, value]) => [key, this.toBoolean(value)]))
+    const { pageSize, page, word, ...rest } = query;
+  
+    // 整理标签参数（gk/zk/...），把 'true'/'false' 转成 boolean
+    const tags = Object.fromEntries(
+      Object.entries(rest).map(([key, value]) => [key, this.toBoolean(value as any)])
+    );
+  
     const where: Prisma.WordBookWhereInput = {
-      word: query.word ? {
-        contains: query.word,
-      } : undefined,
+      // 关键词搜索：同时支持英文单词 和 中文释义
+      ...(word
+        ? {
+            OR: [
+              {
+                word: {
+                  contains: word,
+                  mode: 'insensitive', // 英文不区分大小写
+                },
+              },
+              {
+                translation: {
+                  contains: word, // 中文包含匹配
+                },
+              },
+            ],
+          }
+        : {}),
       ...tags,
     };
+  
     const [total, list] = await Promise.all([
       this.prisma.wordBook.count({ where }),
       this.prisma.wordBook.findMany({
-        where,  
-        skip: (Number(page - 1)) * Number(pageSize),
+        where,
+        skip: (Number(page) - 1) * Number(pageSize),
         take: Number(pageSize),
         orderBy: {
-          frq: 'desc'
-        }
-      })
-    ])
+          frq: 'desc',
+        },
+      }),
+    ]);
+  
     return this.response.success({ total, list });
   }
 

@@ -58,7 +58,7 @@
     </div>
 </template>
 <script setup lang="ts">
-    import { getWordBookList } from '@/apis/word-book';
+    import { getWordListApi } from '@/apis/word-book';
     import { onMounted,ref } from 'vue';
     import { VideoPlay,Reading } from '@element-plus/icons-vue';
     import type { WordQuery,WordList } from '@en/common/word';
@@ -80,7 +80,7 @@
     const total = ref<WordList['total']>();
     const list = ref<WordList['list']>([]);
     const getList = async () => {
-        const res = await getWordBookList(query.value);
+        const res = await getWordListApi(query.value);
         list.value = res.data.list;
         total.value = res.data.total;
         console.log(res);

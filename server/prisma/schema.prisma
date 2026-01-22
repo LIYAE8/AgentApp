@@ -83,6 +83,7 @@ model WordBook {
 
   @@index([word])
   @@index([tag])
+  @@index([translation])
   @@index([word, tag])
 }
 
