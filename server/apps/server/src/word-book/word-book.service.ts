@@ -53,7 +53,7 @@ export class WordBookService {
         skip: (Number(page) - 1) * Number(pageSize),
         take: Number(pageSize),
         orderBy: {
-          frq: 'desc',
+          frq: 'desc',//asc
         },
       }),
     ]);

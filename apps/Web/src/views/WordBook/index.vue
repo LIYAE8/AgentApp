@@ -62,7 +62,7 @@
     import { onMounted,ref } from 'vue';
     import { VideoPlay,Reading } from '@element-plus/icons-vue';
     import type { WordQuery,WordList } from '@en/common/word';
-    import { useAudio } from '@/hooks/useAudio';
+    import { useAudio } from '@/hooks/useAudio.ts';
     const { playAudio } = useAudio({});
     const query = ref<WordQuery>({
         page: 1,
