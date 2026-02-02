@@ -19,6 +19,7 @@
     "axios": "^1.13.2",
     "element-plus": "^2.13.0",
     "gsap": "^3.14.2",
+    "lodash": "^4.17.23",
     "marked": "^17.0.1",
     "pinia": "^2.1.7",
     "pinia-plugin-persistedstate": "^4.7.1",

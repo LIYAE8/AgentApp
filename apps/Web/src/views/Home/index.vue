@@ -9,7 +9,7 @@
                 <div class="text-1xl font-bold pt-5 text-gray-300">超1000000学员的选择，提升您的英语能力</div>
                 <div class="flex items-center gap-2 pt-10">
                     <button
-                        class="bg-indigo-700 text-white rounded-[100px] px-4 py-2 cursor-pointer text-sm block w-30 h-10">立即学习</button>
+                        class="bg-indigo-700 text-white rounded-[100px] px-4 py-2 cursor-pointer text-sm block w-30 h-10" @click="LoginFn()">立即学习</button>
                     <button
                         class="bg-indigo-700 text-white rounded-[100px] px-4 py-2 cursor-pointer text-sm block w-30 h-10">查看课程</button>
                 </div>
@@ -83,7 +83,9 @@
 import Hologram from './components/Hologram.vue'
 import { gsap } from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive,inject } from 'vue'
+import { useLogin } from '@/hooks/useLogin'
+const { showLogin } = useLogin()
 gsap.registerPlugin(ScrollTrigger)
 const stats = reactive([
     { value: 0, suffix: '+', label: '累计学员', target: 1000000 },
@@ -192,6 +194,9 @@ const initProject = () => {
     })
 }
 
+const LoginFn = () => {
+    showLogin()
+}
 onMounted(() => {
     initProject()
 })
