@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@lib/shared';
-import type { Prisma } from '@libs/shared/generated/prisma/client';
-import type { UserRegister,UserLogin } from '@en/common/user/index.ts'
+import { Prisma } from '@lib/shared/generated/prisma/client';
+import type { UserRegister, UserLogin } from '@en/common/user/index.ts'
 import { ResponseService } from '@lib/shared/response/response.service';
 const userSelect = {
   id: true,
@@ -16,51 +16,52 @@ const userSelect = {
 }
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma:PrismaService,private readonly response:ResponseService){
-    
+  constructor(private readonly prisma: PrismaService, private readonly response: ResponseService) {
+
   }
   create(createUserDto) {
     return 'This action adds a new user';
   }
 
-  async login(loginform: UserLogin){
+  async login(loginform: UserLogin) {
     //1. 检查是手机号是否存在
     const user = await this.prisma.user.findUnique({
-      where:{
-        phone:loginform.phone
+      where: {
+        phone: loginform.phone
       }
     })
     if (!user) {
       this.response.error('手机号未注册！')
     }
     //2. 检查密码是否正确
-    if (user?.password !==loginform.password) {
+    if (user?.password !== loginform.password) {
       this.response.error('密码错误！')
     }
     //3. 查询用户信息 更新最后登录时间
     const result = this.prisma.user.update({
-      where:{
-        phone:loginform.phone
+      where: {
+        phone: loginform.phone
       },
-      select:userSelect,
-      data:{
-        lastLoginAt:new Date()
+      select: userSelect,
+      data: {
+        lastLoginAt: new Date()
       }
     })
 
-    return this.response.success(result)
+    return this.response.success(result, '登录成功')
   }
 
-  async register(registerform: UserRegister){
-    const data:Prisma.UserCreateInput = {
-      name:registerform.name,
-      email:registerform.email,
-      phone:registerform.phone,
-      password:registerform.password,
+  async register(registerform: UserRegister) {
+    const data: Prisma.UserCreateInput = {
+      name: registerform.name,
+      email: registerform.email,
+      phone: registerform.phone,
+      password: registerform.password,
     }
+
     //判断手机号是否存在
     const user = await this.prisma.user.findUnique({
-      where:{
+      where: {
         phone: registerform.phone
       }
     })
@@ -70,7 +71,7 @@ export class UserService {
     //判断邮箱
     if (registerform.email) {
       const userEmail = await this.prisma.user.findUnique({
-        where:{
+        where: {
           email: registerform.email
         }
       })
@@ -81,10 +82,10 @@ export class UserService {
     //新增
     const result = await this.prisma.user.create({
       data,
-      select:userSelect
+      select: userSelect
     })
 
-    return this.response.success(result)
+    return this.response.success(result, '注册成功')
   }
 
   async findAll(): Promise<any> {

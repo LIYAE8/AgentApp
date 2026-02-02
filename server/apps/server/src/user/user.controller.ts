@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { UserService } from './user.service';
-import type { UserRegister,UserLogin } from '@en/common/user/index.ts'
+import type { UserRegister, UserLogin } from '@en/common/user/index.ts'
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService) { }
 
   @Post('login')
   login(@Body() loginform) {

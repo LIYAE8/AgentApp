@@ -26,8 +26,12 @@
 
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref ,inject} from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
+import { loginApi } from '@/apis/user/index'
+import { ElMessage } from 'element-plus'
+import { IS_SHOW_LOGIN } from './type'
+const isShowLogin = inject(IS_SHOW_LOGIN, ref(false))
 const form = ref({
     phone: '',
     password: '',
@@ -43,7 +47,13 @@ const rules = {
     ],
 }
 
-const handleLogin = () => {
-    console.log(form.value)
+const handleLogin = async () => {
+    let res = await loginApi(form.value)
+    if (res.code==200) {
+    ElMessage.success(res.message)
+    isShowLogin.value= false
+   }else{
+    ElMessage.error(res.message)
+   }
 }
 </script>
