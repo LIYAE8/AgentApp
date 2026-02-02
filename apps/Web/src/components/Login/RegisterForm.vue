@@ -31,6 +31,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
+import { register } from '@/apis/user/index'
 const form = ref({
     name: '',
     phone: '',
@@ -53,7 +54,7 @@ const rules = {
     ],
 }
 
-const handleRegister = () => {
-   
+const handleRegister = async () => {
+   await register(form.value)
 }
 </script>
