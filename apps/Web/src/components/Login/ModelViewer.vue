@@ -68,13 +68,13 @@ const loadModel = async (url: LoginType) => {
             scene.add(currentModel)
             scene.position.y = -0.8 //往下一点
             currentModel.scale.set(0.8, 0.8, 0.8)
-            if(gltf.animations && gltf.animations.length > 0) {
-                mixer = new THREE.AnimationMixer(currentModel)
-                gltf.animations.forEach((animation) => {
-                    const action = mixer!.clipAction(animation)
-                    action.play()
-                })
-            }
+            // if(gltf.animations && gltf.animations.length > 0) {
+            //     mixer = new THREE.AnimationMixer(currentModel)
+            //     gltf.animations.forEach((animation) => {
+            //         const action = mixer!.clipAction(animation)
+            //         action.play()
+            //     })
+            // }
         })
     }
     emits('changeType', url) // 通知父组件切换类型
