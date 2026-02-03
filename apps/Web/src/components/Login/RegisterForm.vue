@@ -58,12 +58,15 @@ const rules = {
 }
 
 const handleRegister = async () => {
-   const res = await register(form.value)
-   if (res.code==200) {
-    ElMessage.success(res.message)
-    isShowLogin.value= false
-   }else{
-    ElMessage.error(res.message)
+   try {
+    const res = await registerApi(form.value)
+    if (res.code==200) {
+        ElMessage.success(res.message)
+        isShowLogin.value= false
+    }
+   } catch (error) {
+    console.log();
+    ElMessage.error(error.response.data.message)
    }
 }
 </script>

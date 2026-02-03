@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable,ConflictException  } from '@nestjs/common';
 import { PrismaService } from '@lib/shared';
 import { Prisma } from '@lib/shared/generated/prisma/client';
 import type { UserRegister, UserLogin } from '@en/common/user/index.ts'
@@ -66,7 +66,8 @@ export class UserService {
       }
     })
     if (user) {
-      return this.response.error('手机号已经存在');
+      throw new ConflictException('手机号已经存在');
+      // return this.response.error('手机号已经存在');
     }
     //判断邮箱
     if (registerform.email) {

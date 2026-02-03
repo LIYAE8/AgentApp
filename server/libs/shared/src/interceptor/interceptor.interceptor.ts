@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor , HttpException} from '@nestjs/common';
 import { Observable, map } from 'rxjs';
 import { Request } from 'express';
 //同步 异步 then catch ->数据流->pipe -> map filter -> 返回
@@ -26,6 +26,7 @@ export class Interceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
     const request = ctx.getRequest<Request>();
+    const response = ctx.getResponse();
     return next.handle().pipe(map((data) => {
       return {
         timestmap: new Date().toISOString(),
@@ -33,7 +34,7 @@ export class Interceptor implements NestInterceptor {
         // test:data,
         path: request.url,
         message: data.message ?? 'success',//业务逻辑自定义
-        code: data.code ?? 200,//业务逻辑自定义
+        code: response.statusCode ?? 200,//业务逻辑自定义
         success: true,
       };
     }));
