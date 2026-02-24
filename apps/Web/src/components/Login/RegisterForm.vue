@@ -29,18 +29,26 @@
 
 
 <script setup lang="ts">
-import { ref , inject} from 'vue'
+import { ref , inject, useTemplateRef,toRaw} from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
 import { registerApi } from '@/apis/user/index'
 import { ElMessage } from 'element-plus'
 import { IS_SHOW_LOGIN } from './type'
+import type {  UserRegister } from '@en/common/user'
+import { useLogin } from '@/hooks/useLogin'
+import md5 from 'md5'
+import { useUserStore } from '@/stores/user'
+import type { FormInstance } from 'element-plus'
 const isShowLogin = inject(IS_SHOW_LOGIN, ref(false))
-const form = ref({
+const { hideLogin } = useLogin()
+const form = ref<UserRegister>({
     name: '',
     phone: '',
     email: '',
     password: '',
 })
+const formRef = useTemplateRef<FormInstance>('formRef')
+const userStore = useUserStore()
 
 const rules = {
     name: [
@@ -58,15 +66,18 @@ const rules = {
 }
 
 const handleRegister = async () => {
-   try {
-    const res = await registerApi(form.value)
-    if (res.code==200) {
-        ElMessage.success(res.message)
-        isShowLogin.value= false
+    await formRef.value?.validate()
+    await formRef.value?.validate() //触发校验的
+    const res = await registerApi({
+        ...toRaw(form.value),
+        password: toRaw(md5(form.value.password))
+    })
+    if(res.code === 200){
+        userStore.setUser(res.data)
+        ElMessage.success('注册成功')
+        hideLogin()
+    }else{
+        ElMessage.error(res.message)
     }
-   } catch (error) {
-    console.log();
-    ElMessage.error(error.response.data.message)
-   }
 }
 </script>

@@ -34,7 +34,7 @@ export class Interceptor implements NestInterceptor {
         // test:data,
         path: request.url,
         message: data.message ?? 'success',//业务逻辑自定义
-        code: response.statusCode ?? 200,//业务逻辑自定义
+        code: data?.code ?? 200,//业务逻辑自定义
         success: true,
       };
     }));

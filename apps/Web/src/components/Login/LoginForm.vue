@@ -26,16 +26,24 @@
 
 
 <script setup lang="ts">
-import { ref ,inject} from 'vue'
+import { ref ,inject,useTemplateRef,toRaw} from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
 import { loginApi } from '@/apis/user/index'
 import { ElMessage } from 'element-plus'
 import { IS_SHOW_LOGIN } from './type'
+import type { FormInstance } from 'element-plus'
+import type {  UserLogin } from '@en/common/user'
+import { useUserStore } from '@/stores/user'
+import { useLogin } from '@/hooks/useLogin'
+import md5 from 'md5'
 const isShowLogin = inject(IS_SHOW_LOGIN, ref(false))
-const form = ref({
+const form = ref<UserLogin>({
     phone: '',
     password: '',
 })
+const formRef = useTemplateRef<FormInstance>('formRef')
+const { hideLogin } = useLogin()
+const userStore = useUserStore()
 
 const rules = {
     phone: [
@@ -48,12 +56,17 @@ const rules = {
 }
 
 const handleLogin = async () => {
-    let res = await loginApi(form.value)
-    if (res.code==200) {
-    ElMessage.success(res.message)
-    isShowLogin.value= false
-   }else{
-    ElMessage.error(res.message)
-   }
+    await formRef.value?.validate() //触发校验的
+    const res = await loginApi({
+        ...toRaw(form.value),
+        password: toRaw(md5(form.value.password))
+    })
+    if(res.code === 200){
+        userStore.setUser(res.data)
+        ElMessage.success('登录成功')
+        hideLogin()
+    }else{
+        ElMessage.error(res.message)
+    }
 }
 </script>
