@@ -122,7 +122,6 @@ const initProject = () => {
     })
     //卡片过度
     const cards = gsap.utils.toArray('.about-card') as HTMLElement[]
-    console.log(gsap)
     cards.forEach((card, index) => {
         gsap.fromTo(card,
             {
@@ -195,7 +194,9 @@ const initProject = () => {
 }
 
 const LoginFn = () => {
-    showLogin()
+    showLogin().then(()=>{
+        console.log('登录后跳转页面');
+    })
 }
 onMounted(() => {
     initProject()

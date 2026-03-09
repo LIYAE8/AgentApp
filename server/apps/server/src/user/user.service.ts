@@ -38,7 +38,7 @@ export class UserService {
       this.response.error('密码错误！')
     }
     //3. 查询用户信息 更新最后登录时间
-    const result = this.prisma.user.update({
+    const result = await this.prisma.user.update({
       where: {
         phone: loginform.phone
       },
