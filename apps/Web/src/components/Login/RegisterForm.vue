@@ -32,10 +32,11 @@
 import { ref , inject} from 'vue'
 import { User, Lock } from '@element-plus/icons-vue'
 import { registerApi } from '@/apis/user/index'
+import type { UserRegister } from '@en/common/user'
 import { ElMessage } from 'element-plus'
 import { IS_SHOW_LOGIN } from './type'
 const isShowLogin = inject(IS_SHOW_LOGIN, ref(false))
-const form = ref({
+const form = ref<UserRegister>({
     name: '',
     phone: '',
     email: '',

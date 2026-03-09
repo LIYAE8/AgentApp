@@ -69,7 +69,7 @@ export class UserService {
       throw new ConflictException('手机号已经存在');
       // return this.response.error('手机号已经存在');
     }
-    //判断邮箱
+    //判断邮箱是否存在
     if (registerform.email) {
       const userEmail = await this.prisma.user.findUnique({
         where: {
