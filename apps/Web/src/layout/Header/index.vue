@@ -37,17 +37,26 @@
             <div class="flex items-center gap-2 bg-amber-200 text-amber-700 rounded-full px-2 py-1"><el-icon>
                     <Star />
                 </el-icon> <span class="font-bold text-sm">{{ userStore.getUser?.dayNumber ?? 0}}</span></div>
-            <div  class="flex items-center gap-2 border-l cursor-pointer border-gray-200 pl-4">
-                <img class="w-10 h-10 rounded-full ml-2 mr-2"
-                    src="https://gips3.baidu.com/it/u=3493347002,3356558679&fm=3074&app=3074&f=PNG?w=2048&h=2048" />
-                <span class="text-sm font-bold">{{ userStore.getUser?.name ?? '未登录'  }}</span>
-            </div>
+                <el-popover
+                    :width="340"
+                >
+                    <template #reference>
+                    <div  class="flex items-center gap-2 border-l cursor-pointer border-gray-200 pl-4">
+                        <img class="w-10 h-10 rounded-full ml-2 mr-2"
+                            :src="avatar" />
+                        <span class="text-sm font-bold">{{ userStore.getUser?.name ?? '游客'  }}</span>
+                    </div>
+                    </template>
+                    <Profile />
+                </el-popover>
         </div>
     </header>
 </template>
 
 
 <script setup lang="ts">
+import avatar from '@/assets/images/avatar/default-avatar.png';
+import Profile from '@/layout/Profile/index.vue'
 import { Sunny, Star, HomeFilled, Notebook, MagicStick, Reading, Setting } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { useUserStore } from '@/stores/user';

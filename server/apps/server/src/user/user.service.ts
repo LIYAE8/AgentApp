@@ -3,6 +3,8 @@ import { PrismaService } from '@lib/shared';
 import { Prisma } from '@lib/shared/generated/prisma/client';
 import type { UserRegister, UserLogin } from '@en/common/user/index.ts'
 import { ResponseService } from '@lib/shared/response/response.service';
+
+//过滤密码
 const userSelect = {
   id: true,
   name: true,
@@ -12,7 +14,10 @@ const userSelect = {
   password: false,
   avatar: true,
   wordNumber: true,
-  dayNumber: true
+  dayNumber: true,
+  bio:true,
+  isTimingTask:true,
+  timingTaskTime:true
 }
 @Injectable()
 export class UserService {

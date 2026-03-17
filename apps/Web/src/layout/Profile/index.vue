@@ -92,23 +92,23 @@
   </template>
   
   <script setup lang="ts">
+    import avatar from '@/assets/images/avatar/default-avatar.png';
     import { useUserStore } from '@/stores/user';
     import { computed } from 'vue';
     import { useRouter } from 'vue-router';
     const router = useRouter();
     const userStore = useUserStore();
-    // const isLoggedIn = computed(() => userStore.getUser !== null);
-    // const displayName = computed(() => userStore.getUser?.name ?? '');
-    // const bio = computed(() => userStore.getUser?.bio ?? '');
-    // const avatar = computed(() => userStore.getUser?.avatar ?? '');
+    const isLoggedIn = computed(() => !!userStore.getUser );
+    const displayName = computed(() => userStore.getUser?.name ?? '');
+    const bio = computed(() => userStore.getUser?.bio ?? '游客');
 
-    // const loginHandle = () => {
-    //   router.push('/login');
-    // };
-    // const logoutHandle = () => {
-    //   userStore.logout();
-    // };
-    // const gotoPath = (path: string) => {
-    //   router.push(path);
-    // };
+    const loginHandle = () => {
+      router.push('/login');
+    };
+    const logoutHandle = () => {
+      userStore.logout();
+    };
+    const gotoPath = (path: string) => {
+      router.push(path);
+    };
   </script>
