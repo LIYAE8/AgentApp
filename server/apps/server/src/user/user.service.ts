@@ -1,8 +1,10 @@
 import { Injectable,ConflictException  } from '@nestjs/common';
 import { PrismaService } from '@lib/shared';
 import { Prisma } from '@lib/shared/generated/prisma/client';
-import type { UserRegister, UserLogin } from '@en/common/user/index.ts'
+import type { UserRegister, UserLogin ,Token,TokenPayload} from '@en/common/user/index.ts'
+import { AuthService } from '../auth/auth.service';
 import { ResponseService } from '@lib/shared/response/response.service';
+import { JwtService } from '@nestjs/jwt';
 
 //过滤密码
 const userSelect = {
@@ -21,7 +23,7 @@ const userSelect = {
 }
 @Injectable()
 export class UserService {
-  constructor(private readonly prisma: PrismaService, private readonly response: ResponseService) {
+  constructor(private readonly prisma: PrismaService, private readonly response: ResponseService,private readonly authService: AuthService,private readonly jwtService: JwtService) {
 
   }
   create(createUserDto) {
@@ -43,17 +45,29 @@ export class UserService {
       this.response.error('密码错误！')
     }
     //3. 查询用户信息 更新最后登录时间
-    const result = await this.prisma.user.update({
+    // const result = await this.prisma.user.update({
+    //   where: {
+    //     phone: loginform.phone
+    //   },
+    //   select: userSelect,
+    //   data: {
+    //     lastLoginAt: new Date()
+    //   }
+    // })
+    //3. 查询用户信息 更新最后登录时间
+    const updateUser = await this.prisma.user.update({
       where: {
-        phone: loginform.phone
+        id: user?.id, //查询用户ID
       },
-      select: userSelect,
       data: {
-        lastLoginAt: new Date()
-      }
+        lastLoginAt: new Date(), //最后登录时间
+      },
+      select: userSelect
     })
-
-    return this.response.success(result, '登录成功')
+    //4. 生成token
+    const token = this.authService.generateToken({ userId: updateUser.id, name: updateUser.name, email: updateUser.email });
+    return this.response.success({...updateUser,token});
+    // return this.response.success(result, '登录成功')
   }
 
   async register(registerform: UserRegister) {
@@ -86,14 +100,39 @@ export class UserService {
       }
     }
     //新增
-    const result = await this.prisma.user.create({
+    const newUser = await this.prisma.user.create({
       data,
       select: userSelect
     })
 
-    return this.response.success(result, '注册成功')
+    //4. 生成token
+    const token = this.authService.generateToken({ userId: newUser.id, name: newUser.name, email: newUser.email });
+    return this.response.success({...newUser,token});
+    // return this.response.success(result, '注册成功')
+    
   }
-
+//刷新token
+async refreshToken(createUserDto: Omit<Token, 'accessToken'>) {
+  try {
+  //1. 验证refreshToken是否有效
+  const decoded = this.jwtService.verify<TokenPayload>(createUserDto.refreshToken);
+  //2. 查询用户信息分辨是否伪造payload
+  const user = await this.prisma.user.findUnique({
+    where: {
+      id: decoded.userId, //查询用户ID
+    }
+  })
+  if (!user) {
+    return this.response.error('用户不存在');
+  }
+  //3. 生成新的token
+  const token = this.authService.generateToken({ userId: user.id, name: user.name, email: user.email });
+  //4. 返回新的token
+  return this.response.success(token);
+  } catch (error) {
+    return this.response.error('refreshToken已过期或无效');
+  }
+}
   async findAll(): Promise<any> {
     // console.log(this.prisma)
     const test = await this.prisma.user.findMany()

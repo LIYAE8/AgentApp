@@ -1,6 +1,6 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import type { WebResultUser ,UserUpdate} from '@en/common/user'
+import type { WebResultUser ,UserUpdate,Token} from '@en/common/user'
 export const useUserStore = defineStore('user', () => {
   const user = ref<WebResultUser | null>(null) //用户信息
   const setUser = (params:any) => {
@@ -32,5 +32,13 @@ export const useUserStore = defineStore('user', () => {
   const logout = () => {
     user.value = null //退出登录
   }
-  return { user, setUser, getUser, logout,getUpdateUserInfo,updateUser }
+   //导出accessToken
+   const getAccessToken = computed(() => user.value?.token.accessToken)
+   //导出refreshToken
+   const getRefreshToken = computed(() => user.value?.token.refreshToken)
+   //更新token
+   const updateToken = (newToken: Token) => {
+     user.value!.token = newToken
+   }
+  return { user, setUser, getUser, logout,getUpdateUserInfo,updateUser,getAccessToken,getRefreshToken,updateToken }
 }, { persist: true }) //持久化存储localStorage
