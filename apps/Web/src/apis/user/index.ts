@@ -1,10 +1,11 @@
-import { serverApi,refreshApi } from "..";
-import type { UserLogin, UserRegister, WebResultUser,Token } from "@en/common/user";
-import type { Response } from "..";
-export const registerApi = (params: UserRegister): Promise<Response<WebResultUser>> => {
-    return serverApi.post('/user/register', params) as Promise<Response<WebResultUser>>
-}
-export const loginApi = (params: UserLogin): Promise<Response<WebResultUser>> => {
-    return serverApi.post('/user/login', params) as Promise<Response<WebResultUser>>
-}
-export const refreshTokenApi = (data: Omit<Token, 'accessToken'>) => refreshApi.post('/user/refresh-token', data) as Promise<Response<Token>>
+import { serverApi, type Response } from '..';
+import type { UserLogin, UserRegister,WebResultUser,AvatarResult,UserUpdate } from "@en/common/user";
+
+//用户登录
+export const login = (data: UserLogin) => serverApi.post('/user/login', data) as Promise<Response<WebResultUser>>
+//用户注册
+export const register = (data: UserRegister) => serverApi.post('/user/register', data) as Promise<Response<WebResultUser>>
+//上传头像
+export const uploadAvatar = (file: FormData) => serverApi.post('/user/upload-avatar', file) as Promise<Response<AvatarResult>>
+//更新用户信息
+export const updateUser = (data: UserUpdate) => serverApi.post('/user/update-user', data) as Promise<Response<UserUpdate>>

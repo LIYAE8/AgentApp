@@ -13,10 +13,10 @@
         <!-- 登录/注册切换按钮 -->
         <div class="absolute top-6 right-6">
             <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-lg p-1">
-                <button @click="debouncedLoadModel('login')" :class="loginClass">
+                <button @click="loadModel('login')" :class="loginClass">
                     登录
                 </button>
-                <button @click="debouncedLoadModel('register')" :class="registerClass">
+                <button @click="loadModel('register')" :class="registerClass">
                     注册
                 </button>
             </div>
@@ -30,7 +30,6 @@ import * as THREE from 'three'
 import type { LoginType } from './type'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js' //gltf模型加载器
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js' //轨道控制器
-import { debounce } from 'lodash'
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef') //获取canvas元素引用 渲染容器
 const type = ref<LoginType>('login') // 登录/注册类型
 const loginClass = computed(() => {
@@ -41,11 +40,10 @@ const registerClass = computed(() => {
 })
 const emits = defineEmits(['changeType'])
 const scene = new THREE.Scene() //创建场景
-const clock = new THREE.Clock() //创建时钟
+const clock = new THREE.Timer() //创建时钟
 let currentModel: THREE.Group | null = null //记录当前的模型
 let mixer: THREE.AnimationMixer | null = null //记录当前的动画混合器
-
-const loadModel = async (url: LoginType) => {
+const loadModel = (url: LoginType) => {
     //移除当前模型
     if (currentModel) {
         scene.remove(currentModel)
@@ -68,21 +66,18 @@ const loadModel = async (url: LoginType) => {
             scene.add(currentModel)
             scene.position.y = -0.8 //往下一点
             currentModel.scale.set(0.8, 0.8, 0.8)
-            // if(gltf.animations && gltf.animations.length > 0) {
-            //     mixer = new THREE.AnimationMixer(currentModel)
-            //     gltf.animations.forEach((animation) => {
-            //         const action = mixer!.clipAction(animation)
-            //         action.play()
-            //     })
-            // }
+            if(gltf.animations && gltf.animations.length > 0) {
+                mixer = new THREE.AnimationMixer(currentModel)
+                gltf.animations.forEach((animation) => {
+                    const action = mixer!.clipAction(animation)
+                    action.play()
+                })
+            }
         })
     }
     emits('changeType', url) // 通知父组件切换类型
 }
 
-const debouncedLoadModel = debounce((url: LoginType) => {
-    loadModel(url)
-}, 300)
 const initThree = () => {
     const width = canvasRef.value!.clientWidth //获取canvas宽度
     const height = canvasRef.value!.clientHeight //获取canvas高度

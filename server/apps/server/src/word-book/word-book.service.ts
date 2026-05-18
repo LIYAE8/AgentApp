@@ -1,75 +1,37 @@
-import { Injectable, Query } from '@nestjs/common';
-import { WordQuery } from '@en/common/word';
-import { ResponseService } from '@lib/shared/response/response.service';
-import { PrismaService } from '@lib/shared/prisma/prisma.service';
-import { Prisma } from '@lib/shared/generated/prisma/client';
+import { Injectable } from '@nestjs/common';
+import type { WordQuery } from '@en/common/word';
+import { ResponseService, PrismaService } from '@libs/shared';
+import type { Prisma } from '@libs/shared/generated/prisma/client';
 
 @Injectable()
 export class WordBookService {
-  constructor(private readonly response: ResponseService, private readonly prisma: PrismaService) { }
+  constructor(
+    private readonly responseService: ResponseService,
+    private readonly prismaService: PrismaService,
+  ) { }
 
   private toBoolean(value: string | boolean): boolean | undefined {
     return value === 'true' ? true : undefined;
   }
 
-  create(body: { word: string }) {
-    return 'This action adds a new wordBook';
-  }
-
   async findAll(query: WordQuery) {
-    const { pageSize, page, word, ...rest } = query;
-  
-    // 整理标签参数（gk/zk/...），把 'true'/'false' 转成 boolean
-    const tags = Object.fromEntries(
-      Object.entries(rest).map(([key, value]) => [key, this.toBoolean(value as any)])
-    );
-  
+    const { page = 1, pageSize = 12, word, ...rest } = query
+    const tags = Object.fromEntries(Object.entries(rest).map(([key, value]) => [key, this.toBoolean(value)]))
     const where: Prisma.WordBookWhereInput = {
-      // 关键词搜索：同时支持英文单词 和 中文释义
-      ...(word
-        ? {
-            OR: [
-              {
-                word: {
-                  contains: word,
-                  mode: 'insensitive', // 英文不区分大小写
-                },
-              },
-              {
-                translation: {
-                  contains: word, // 中文包含匹配
-                },
-              },
-            ],
-          }
-        : {}),
-      ...tags,
-    };
-  
-    const [total, list] = await Promise.all([
-      this.prisma.wordBook.count({ where }),
-      this.prisma.wordBook.findMany({
+      word: word ? {contains: word} : undefined,
+      ...tags
+    }
+    const [total = 0, list = []] = await Promise.all([
+      this.prismaService.wordBook.count({ where }),
+      this.prismaService.wordBook.findMany({
         where,
         skip: (Number(page) - 1) * Number(pageSize),
         take: Number(pageSize),
         orderBy: {
-          frq: 'desc',//asc
+          frq: 'desc',
         },
       }),
-    ]);
-  
-    return this.response.success({ total, list });
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} wordBook`;
-  }
-
-  update(id: number, body: { word: string }) {
-    return `This action updates a #${id} wordBook`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} wordBook`;
+    ])
+    return this.responseService.success({ total, list });
   }
 }
