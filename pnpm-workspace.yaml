@@ -2,6 +2,7 @@ packages:
   - "apps/*"
   - "server"
   - "packages/*"
+  - "tracker"
 allowBuilds:
   '@nestjs/core': true
   '@prisma/engines': true
