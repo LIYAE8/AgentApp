@@ -2,7 +2,7 @@
 	"scripts": {
 		"web": "pnpm --filter @en/web dev",
 		"server": "pnpm --filter @en/server start:dev",
-		"ai-server": "pnpm --filter @en/server start:dev ai-server",
+		"ai-server": "pnpm --filter @en/server exec nest start ai --watch",
 		"all": "concurrently \"pnpm run web\" \"pnpm run server\" \"pnpm run ai-server\""
 		
 	},
