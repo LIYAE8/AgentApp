@@ -7,7 +7,7 @@
                 </el-icon>
                 <span class="text-2xl font-bold text-gray-800">词库列表</span>
             </div>
-            <div class="text-sm text-gray-600 mt-2">词典来源：牛津、柯林斯、BNC、FRQ、高考、中考、GRE、TOEFL、IELTS、大学英语六级、大学英语四级、考研</div>
+            <div class="text-sm text-gray-600">词典来源：牛津、柯林斯、BNC、FRQ、高考、中考、GRE、TOEFL、IELTS、大学英语六级、大学英语四级、考研</div>
         </div>
         <div class="flex items-center mb-10">
             <el-input @keyup.enter="searchWord" class="mr-10" v-model="query.word" placeholder="请输入单词"></el-input>
@@ -45,58 +45,49 @@
                     </div>
                 </div>
             </div>
-            <el-pagination
-                class="mt-10"
-                background
-                :current-page="query.page"
-                :page-size="query.pageSize"
-                :total="total"
-                @current-change="handlePageChange"
-                @size-change="handleSizeChange"
-            />
+            <el-pagination class="mt-10" background v-model:current-page="query.page" v-model:page-size="query.pageSize"
+                :total="total" @current-change="getList" @size-change="getList" />
         </div>
     </div>
 </template>
+
 <script setup lang="ts">
-    import { getWordListApi } from '@/apis/word-book';
-    import { onMounted,ref } from 'vue';
-    import { VideoPlay,Reading } from '@element-plus/icons-vue';
-    import type { WordQuery,WordList } from '@en/common/word';
-    import { useAudio } from '@/hooks/useAudio.ts';
-    const { playAudio } = useAudio({});
-    const query = ref<WordQuery>({
-        page: 1,
-        pageSize: 12,
-        word: '',
-        gk: false,
-        zk: false,
-        gre: false,
-        toefl: false,
-        ielts: false,
-        cet6: false,
-        cet4: false,
-        ky: false,
-    })
-    const total = ref<WordList['total']>();
-    const list = ref<WordList['list']>([]);
-    const getList = async () => {
-        const res = await getWordListApi(query.value);
-        list.value = res.data.list;
-        total.value = res.data.total;
-        console.log(res);
+import { ref, onMounted } from 'vue'
+import { getWordBookList } from '@/apis/word-book'
+import type { WordQuery, WordList } from '@en/common/word'
+import { Reading, VideoPlay } from '@element-plus/icons-vue'
+import { useAudio } from '@/hooks/useAudio'
+const { playAudio } = useAudio({})
+const total = ref<WordList['total']>(0)
+const list = ref<WordList['list']>([])
+const query = ref<WordQuery>({
+    page: 1,
+    pageSize: 12,
+    word: '',
+    gk: false,
+    zk: false,
+    gre: false,
+    toefl: false,
+    ielts: false,
+    cet6: false,
+    cet4: false,
+    ky: false,
+})
+const searchWord = () => {
+    query.value.page = 1 //重置一下页数
+    getList() //重新获取列表
+}
+
+const getList = async () => {
+    const res = await getWordBookList(query.value)
+    if (res.success) {
+        total.value = res.data.total
+        list.value = res.data.list
     }
-    const searchWord = async () => {
-        query.value.page = 1;
-        await getList();
-    }
-    const handlePageChange = (page: number) => {
-        query.value.page = page;
-        getList();
-    }
-    const handleSizeChange = (size: number) => {
-        query.value.pageSize = size;
-        query.value.page = 1;
-        getList();
-    }
-    onMounted(() => {getList()});
+}
+
+
+onMounted(() => {
+    getList()
+})
 </script>

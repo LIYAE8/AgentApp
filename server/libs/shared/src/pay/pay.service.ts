@@ -6,11 +6,13 @@ export class PayService implements OnModuleInit{
     constructor(private readonly configService: ConfigService) {}
     public alipaySdk: AlipaySdk;
     onModuleInit() {
+        const appId = this.configService.get<string>('ALIPAY_APP_ID');
+        if (!appId) return;
         this.alipaySdk = new AlipaySdk({
-            appId: this.configService.get<string>('ALIPAY_APP_ID')!,//appId
-            privateKey: this.configService.get<string>('ALIPAY_PRIVATE_KEY')!, //支付宝应用私钥
-            alipayPublicKey: this.configService.get<string>('ALIPAY_PUBLIC_KEY')!, //支付宝公钥
-            gateway: this.configService.get<string>('ALIPAY_GATEWAY')!, //支付宝网关
+            appId,
+            privateKey: this.configService.get<string>('ALIPAY_PRIVATE_KEY')!,
+            alipayPublicKey: this.configService.get<string>('ALIPAY_PUBLIC_KEY')!,
+            gateway: this.configService.get<string>('ALIPAY_GATEWAY')!,
         });
     }
     getAlipaySdk() {
