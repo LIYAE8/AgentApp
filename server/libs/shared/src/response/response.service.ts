@@ -9,7 +9,7 @@ export class ResponseService {
             code
         }
     }
-    error(message: string | null= '操作失败', code: number = 500) {
+    error(data: any = null,message: string | null= '操作失败', code: number = 500) {
         return {
             message,
             code

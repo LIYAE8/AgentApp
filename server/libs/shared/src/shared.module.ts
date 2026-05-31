@@ -4,11 +4,12 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ResponseModule } from './response/response.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MinioModule } from './minio/minio.module';
 
 @Global()
 @Module({
   providers: [SharedService],
-  exports: [SharedService, PrismaModule, ResponseModule, JwtModule, ConfigModule],
+  exports: [SharedService, PrismaModule, ResponseModule, JwtModule, ConfigModule,MinioModule],
   imports: [
     PrismaModule, ResponseModule,
     ConfigModule.forRoot({
@@ -22,7 +23,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         secret: configService.get('SECRET_KEY'), //秘钥
         signOptions: { expiresIn: 10 }, //10秒过期 方便测试
       }),
-    })
+    }),
+    MinioModule
   ],
 })
 export class SharedModule { }
