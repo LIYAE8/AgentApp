@@ -1,0 +1,26 @@
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: agentapp-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+
+  minio:
+    image: minio/minio:latest
+    container_name: agentapp-minio
+    ports:
+      - "9002:9000"
+      - "9003:9001"
+    environment:
+      MINIO_ROOT_USER: NNB5MZ7V6ODYKRVYP1DT
+      MINIO_ROOT_PASSWORD: CIeKqX6IK1VG7drJ3RDlGwIL9UA4LGpJRm9276z+
+    volumes:
+      - minio_data:/data
+    command: server /data --console-address ":9001"
+
+volumes:
+  redis_data:
+  minio_data:

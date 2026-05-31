@@ -6,19 +6,19 @@
     "deleteOutDir": true,
     "tsConfigPath": "apps/server/tsconfig.app.json"
   },
-  "generateOptins": {
+  "generateOptions": {
     "spec": false
   },
   "monorepo": true,
   "root": "apps/server",
   "projects": {
-    "ai-server": {
+    "ai": {
       "type": "application",
-      "root": "apps/ai-server",
+      "root": "apps/ai",
       "entryFile": "main",
-      "sourceRoot": "apps/ai-server/src",
+      "sourceRoot": "apps/ai/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/ai-server/tsconfig.app.json"
+        "tsConfigPath": "apps/ai/tsconfig.app.json"
       }
     },
     "server": {

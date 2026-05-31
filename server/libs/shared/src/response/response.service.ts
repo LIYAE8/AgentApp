@@ -1,19 +1,36 @@
 import { Injectable } from '@nestjs/common';
-
+const Business = {
+    SUCCESS: {
+        code: 200,
+        message: 'success',
+    },
+    ERROR: {
+        code: 500,
+        message: 'error',
+    },
+    LOGIN:{
+        code: 1,
+        message: '手机号一已经存在',
+    },
+    EMAIL:{
+        code: 2,
+        message: '邮箱已经存在',
+    },
+}
 @Injectable()
 export class ResponseService {
-    success(data: any = null, message: string | null = '操作成功',code: number = 200) {
+    success(data: any) {
         return {
             data,
-            message,
-            code
+            code: Business.SUCCESS.code,
+            message: Business.SUCCESS.message,
         }
     }
-    error(data: any = null,message: string | null= '操作失败', code: number = 500) {
+    error(data = null, message: string, code: number = Business.ERROR.code) {
         return {
-            message,
-            code
+            data,
+            code,
+            message: message || Business.ERROR.message,
         }
     }
 }
-        

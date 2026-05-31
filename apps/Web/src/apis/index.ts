@@ -1,27 +1,18 @@
 import axios from 'axios'
-import { useUserStore } from '@/stores/user'
-import router from '@/router'
-import { refreshTokenApi } from './auth'
+import { useUserStore } from '@/stores/user' //pinia user的
+import router from '@/router' //路由
+import { refreshTokenApi } from './auth' //刷新token接口
+import { ElMessage } from 'element-plus' //引入element-plus的提示框
+export const uploadUrl = import.meta.env.VITE_MINIO_ENDPOINT
+export const socketUrl = import.meta.env.VITE_SOCKET_URL
 export const timeout = 50000
-export const uploadUrl = import.meta.env.DEV ? 'http://192.168.1.3:9001' : ''
-//刷新token接口
-export const refreshApi = axios.create({
-    baseURL: '/api/v1',
-    timeout,
-})
-refreshApi.interceptors.response.use(res => {
-    return res.data
-}, async error => {
-    return Promise.reject(error)
-})
 //server服务器接口
 export const serverApi = axios.create({
     baseURL: '/api/v1',
     timeout,
 })
-//存储失败的请求
-let requestQueue: ((newAccessToken: string) => void)[] = [] //存储失败的请求
 let isRefreshing = false //是否正在刷新token
+let requestQueue: ((newAccessToken: string) => void)[] = [] //存储失败的请求
 //请求拦截器
 serverApi.interceptors.request.use(config => {
     const userStore = useUserStore()
@@ -34,21 +25,26 @@ serverApi.interceptors.request.use(config => {
 serverApi.interceptors.response.use(res => {
     return res.data
 }, async error => {
-    //1.非token过期错误,则直接返回错误
+    if(error.code === "ERR_NETWORK"){
+        ElMessage.error('网络连接失败,请重试')
+        return Promise.reject(error)
+    }
     if (error.response.status !== 401) {
+        ElMessage.error('服务器异常,请稍后再试')
+        //其他code码就直接抛出异常
         return Promise.reject(error)
     }
+    //下面的逻辑就是处理401的情况了
     const userStore = useUserStore()
-    const accessToken = userStore.getAccessToken //读取accessToken
-    const refreshToken = userStore.getRefreshToken //读取refreshToken
+    const accessToken = userStore.getAccessToken
+    const refreshToken = userStore.getRefreshToken
     const originalRequest = error.config //读取原始请求
-    //2.如果token被清空,则退出登录
     if (!accessToken || !refreshToken) {
-        userStore.logout() //如果token被清空,则退出登录
-        router.replace('/') //如果token被清空,则跳转到到首页
+        userStore.logout() //清空user
+        ElMessage.error('登录已过期,请重新登录')
+        router.replace('/') //跳转到首页
         return Promise.reject(error)
     }
-    //3.如果正在刷新token,则将请求存储到队列中,等待token刷新后重新请求
     if (isRefreshing) {
         return new Promise((resolve) => {
             requestQueue.push((newAccessToken: string) => {
@@ -57,35 +53,32 @@ serverApi.interceptors.response.use(res => {
             })
         })
     }
-    //4.开始刷新token
+    //刷新token调用接口
     isRefreshing = true
     try {
         const newToken = await refreshTokenApi({ refreshToken: refreshToken })
         if (newToken.success) {
-            userStore.updateToken(newToken.data) //更新token
+            //切换成功更新token到pinia中
+            userStore.updateToken(newToken.data)
         } else {
-            console.log('asasddsda')
-            userStore.logout() //如果token被清空,则退出登录
-            router.replace('/') //如果token被清空,则跳转到到首页
+            userStore.logout() //清空user
+            ElMessage.error('登录已过期,请重新登录')
+            router.replace('/') //跳转到首页
             return Promise.reject(error)
         }
-        //5.发送存储的请求
         const newAccessToken = newToken.data.accessToken
-        requestQueue.forEach(callback => callback(newAccessToken))
+        requestQueue.forEach(callback => callback(newAccessToken)) //执行存储的请求
         return serverApi(originalRequest)
-    }
-    catch (error) {
-        console.log(error)
+    } catch (error) {
         return Promise.reject(error)
     } finally {
         requestQueue = [] //清空队列
         isRefreshing = false //重置刷新状态
     }
 })
-//----------------------------AI------------------------------------------------
 //ai服务器接口
 export const aiApi = axios.create({
-    baseURL: '/api/ai/v1',
+    baseURL: '/ai/v1',
     timeout,
 })
 

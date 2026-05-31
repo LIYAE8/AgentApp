@@ -23,7 +23,7 @@
             <el-popover :width="340">
                 <template #reference>
                     <div class="flex items-center gap-2 border-l cursor-pointer border-gray-200 pl-4">
-                        <img class="w-10 h-10 rounded-full ml-2 mr-2" :src="previewUrl" />
+                        <img class="w-10 h-10 rounded-full ml-2 mr-2" :src="avatar" />
                         <span class="text-sm font-bold">{{ userStore.getUser?.name ?? '游客' }}</span>
                     </div>
                 </template>
@@ -40,18 +40,16 @@ import { useRouter } from 'vue-router';
 import { watch, ref } from 'vue'
 import { useUserStore } from '@/stores/user';
 import Profile from '../Profile/index.vue'
-import {usePreview} from '@/hooks/usePreview'
+import { useAvatar } from '@/hooks/useAvatar'
 import { useLogin } from '@/hooks/useLogin'
-
-const { showLogin } = useLogin()
+const { avatar } = useAvatar()
+const { login } = useLogin()
 const userStore = useUserStore()
 const router = useRouter()
 const currentPath = ref('')
-const previewUrl = ref()
-previewUrl.value = usePreview(userStore.getUpdateUserInfo.avatar).value
 const routes = [
     { path: '/', name: '主页', icon: HomeFilled, isAuth: false },  //不需要登录
-    { path: '/smart/chat', name: 'AI', icon: MagicStick, isAuth: true },  //需要登录
+    { path: '/chat/index', name: '聊天', icon: MagicStick, isAuth: true },  //需要登录
     { path: '/word-book/index', name: '词库', icon: Notebook, isAuth: false },  //不需要登录
     { path: '/courses/index', name: '课程', icon: Reading, isAuth: false },  //不需要登录
     { path: '/setting/index', name: '设置', icon: Setting, isAuth: true },  //需要登录
@@ -68,7 +66,7 @@ const gotoPath = async (path: string) => {
     const isAuth = routes.find(route => route.path === path)?.isAuth ?? false
     //如果是true表示必须登录
     if (isAuth) {
-        await showLogin()
+        await login()
         //如果登录了下面的代码才会走
         if (userStore.getUser) {
             router.push(path)

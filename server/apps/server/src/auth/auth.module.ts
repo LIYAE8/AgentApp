@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SharedModule } from '@lib/shared';
+import { SharedModule } from '@libs/shared';
 @Module({
     imports:[SharedModule], //jwtService
     providers:[AuthService],

@@ -14,7 +14,6 @@ refreshServer.interceptors.response.use(res => {
 })
 
 //导出刷新token的接口了
-
 export const refreshTokenApi = (data: Omit<Token, 'accessToken'>) => refreshServer.post('/user/refresh-token', data) as Promise<Response<Token>>
 
 //为什么要分开 隔离起来 防止死循环

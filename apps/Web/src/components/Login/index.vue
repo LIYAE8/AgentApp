@@ -1,58 +1,56 @@
 <template>
-    <div>
-        <div v-if="isShowLogin" class="fixed inset-0 bg-black opacity-30 filter blur-sm z-40"></div>
-        <Transition name="fade">
-            <div v-if="isShowLogin" class="fixed inset-30  flex items-center justify-center z-50">
-                <div class="w-[1200px] h-[700px] bg-white rounded-[20px] shadow-2xl overflow-hidden flex">
-                    <!-- 左侧 3D 模型区域 -->
-                    <ModelViewer @changeType="changeType" ref="modelViewerRef" />
-                    
-                    <!-- 右侧登录表单区域 -->
-                    <div class="flex-1 flex flex-col justify-center px-12 py-10 bg-white">
-                        <LoginForm v-if="currentType === 'login'" />
-                        <RegisterForm v-if="currentType === 'register'" />
+    <div v-if="isShowLogin" class="fixed inset-0 bg-black opacity-30 filter blur-sm z-40"></div>
+    <Transition name="fade">
+        <div v-if="isShowLogin" class="fixed inset-30  flex items-center justify-center z-50">
+            <div class="w-[1200px] h-[700px] bg-white rounded-[20px] shadow-2xl overflow-hidden flex">
+                <!-- 左侧 3D 模型区域 -->
+                <ModelViewer @changeType="changeType" ref="modelViewerRef" />
+
+                <!-- 右侧登录表单区域 -->
+                <div class="flex-1 flex flex-col justify-center px-12 py-10 bg-white">
+                    <LoginForm v-if="loginType === 'login'" />
+                    <RegisterForm v-if="loginType === 'register'" />
+                    <div class="mt-6 text-center">
+                        <div class="flex items-center justify-center gap-4 text-sm text-gray-500">
+                            <span class="cursor-pointer hover:text-indigo-600 transition-colors">忘记密码？</span>
+                            <span class="text-gray-300">|</span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </Transition>
-    </div>
+        </div>
+    </Transition>
 </template>
 
 <script setup lang="ts">
 import ModelViewer from './ModelViewer.vue'
 import LoginForm from './LoginForm.vue'
 import RegisterForm from './RegisterForm.vue'
-import { inject,ref } from 'vue'
-import { IS_SHOW_LOGIN, type LoginType } from './type'
-import { useLogin } from '@/hooks/useLogin'
-const { hideLogin } = useLogin()
+import { ref, inject } from 'vue'
+import { IS_SHOW_LOGIN } from './type'
+import type { LoginType } from './type'
 const isShowLogin = inject(IS_SHOW_LOGIN, ref(false))
-const currentType = ref<LoginType>('login')
-const changeType = (type:LoginType)=>{
-    currentType.value = type
+const loginType = ref<LoginType>('login')
+//1. pinia
+//2. event bus
+//3. provide/inject
+const changeType = (url: LoginType) => {
+    loginType.value = url
 }
-window.addEventListener('keydown',(e: KeyboardEvent)=>{
-    if(e.key === 'Escape'){
-        hideLogin()
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        isShowLogin.value = false
     }
 })
 </script>
 
 <style scoped>
-    .fade-enter-active,
-    .fade-leave-active {
-        transition: all 0.3s ease;
-    }
-
-    .fade-enter-from,
-    .fade-leave-to {
-        opacity: 0;
-        transform: scale(0.5);
-    }
-
-    .fade-enter-to,
-    .fade-leave-from {
-        opacity: 1;
-        transform: scale(1);
-    }
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.3s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
 </style>
