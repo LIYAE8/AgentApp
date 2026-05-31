@@ -8,15 +8,16 @@ export const useUserStore = defineStore('user', () => {
   }
   const getUser = computed(() => user.value) //获取用户信息
   //返回需要更新的用户信息
-  const getUpdateUserInfo = computed<UserUpdate>(() => {
+  const getUpdateUserInfo = computed(() => {
     return {
-      name: user.value!.name,
-      email: user.value!.email,
-      address: user.value!.address,
-      bio: user.value!.bio,
-      isTimingTask: user.value!.isTimingTask,
-      timingTaskTime: user.value!.timingTaskTime,
-      avatar: user.value!.avatar
+      id:user?.value?.id,
+      name: user?.value?.name,
+      email: user?.value?.email,
+      address: user?.value?.address,
+      bio: user?.value?.bio,
+      isTimingTask: user?.value?.isTimingTask,
+      timingTaskTime: user?.value?.timingTaskTime,
+      avatar: user?.value?.avatar
     }
   })
   //更新用户信息

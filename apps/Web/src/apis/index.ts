@@ -3,6 +3,7 @@ import { useUserStore } from '@/stores/user'
 import router from '@/router'
 import { refreshTokenApi } from './auth'
 export const timeout = 50000
+export const uploadUrl = import.meta.env.DEV ? 'http://192.168.1.3:9001' : ''
 //刷新token接口
 export const refreshApi = axios.create({
     baseURL: '/api/v1',

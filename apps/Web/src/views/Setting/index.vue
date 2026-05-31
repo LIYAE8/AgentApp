@@ -7,7 +7,7 @@
             </div>
 
             <div class="flex gap-2">
-                <el-button>重置</el-button>
+                <el-button @click="init()">重置</el-button>
                 <el-button @click="onSave" type="primary">保存</el-button>
             </div>
         </div>
@@ -20,7 +20,7 @@
                     </template>
 
                     <div class="flex items-center gap-4">
-                        <img class="w-20 h-20 rounded-full object-cover border-2 border-gray-200" :src="avatar"
+                        <img class="w-20 h-20 rounded-full object-cover border-2 border-gray-200" :src="previewUrl || avatar"
                             loading="lazy" referrerpolicy="no-referrer" />
 
                         <div class="flex flex-col gap-2">
@@ -95,7 +95,7 @@
 
                     <div class="flex items-center justify-between">
                         <div>
-                            <div class="font-bold text-slate-900">退出登录</div>
+                            <div class="font-bold text-slate-900" @click="logoutHandle">退出登录</div>
                             <div class="text-sm text-slate-500">清除本地登录状态</div>
                         </div>
                         <el-button @click="logoutHandle" type="danger" plain>
@@ -116,7 +116,12 @@ import type { FormRules } from 'element-plus'
 import type { UploadFile,FormInstance } from 'element-plus' //上传文件类型
 import { useUserStore } from '@/stores/user'
 import { ElMessage,ElMessageBox } from 'element-plus' //提示信息
+import { uploadAvatarApi,updateUser } from '@/apis/user'
+import { uploadUrl } from '@/apis'
+import { useLogin } from '@/hooks/useLogin'
+const { logout } = useLogin()
 
+const previewUrl = ref('')
 const formRef = useTemplateRef<FormInstance>('formRef') //表单ref
 const userStore = useUserStore()
 const form = ref<UserUpdate>({
@@ -154,9 +159,28 @@ const rules: FormRules = {
 }
 //上传头像
 const onAvatarSelect = async (file: UploadFile) => {
+    const formData = new FormData()
+    formData.append('file', file.raw as File)
+    const res = await uploadAvatarApi(formData)
+    if (res.success && res.data) {
+        form.value.avatar = res.data.databaseUrl
+        previewUrl.value = res.data.previewUrl
+    } else {
+        ElMessage.error(res.message)
+    }
 }
 //提交保存接口的
 const onSave = async () => {
+    await formRef.value?.validate()
+    const id = userStore.getUpdateUserInfo.id
+    const params = {...form.value, id}
+    const res = await updateUser (params) 
+    if (res.success && res.data) {
+        userStore.updateUser(res.data) //更新用户信息
+        ElMessage.success('更新成功')
+    } else {
+        ElMessage.error(res.message)
+    }
 }
 //退出登录
 const logoutHandle = () => {
@@ -165,15 +189,18 @@ const logoutHandle = () => {
         cancelButtonText: '取消',
         type: 'warning',
     }).then(() => {
+        logout
     })
 }
+
 const init = () => {
     //如果用户登录了，则获取用户信息
     if(userStore.getUser) {
         form.value = {...userStore.getUpdateUserInfo}
-        // previewUrl.value = customAvatar(form.value.avatar!)
+        previewUrl.value = uploadUrl + form.value.avatar
     }
 }
+
 onMounted(() => {
     init()
 })
