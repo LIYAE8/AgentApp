@@ -9,7 +9,7 @@
         >
           <img
             class="size-10 rounded-full object-cover"
-            :src="avatar"
+            :src="previewUrl || avatar"
             loading="lazy"
           />
         </div>
@@ -96,17 +96,30 @@
     import { useUserStore } from '@/stores/user';
     import { computed } from 'vue';
     import { useRouter } from 'vue-router';
+    import {usePreview} from '@/hooks/usePreview'
+    import { ref } from 'vue';
+    import { ElMessageBox } from 'element-plus'
+    import { useLogin } from '@/hooks/useLogin'
+    const { showLogin, logout } = useLogin()
     const router = useRouter();
     const userStore = useUserStore();
     const isLoggedIn = computed(() => !!userStore.getUser );
     const displayName = computed(() => userStore.getUser?.name ?? '');
     const bio = computed(() => userStore.getUser?.bio ?? '游客');
+    const previewUrl = ref()
 
+    previewUrl.value = usePreview(userStore.getUpdateUserInfo.avatar).value
     const loginHandle = () => {
-      router.push('/login');
+      showLogin()
     };
     const logoutHandle = () => {
-      userStore.logout();
+      ElMessageBox.confirm('确定退出登录吗？', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning',
+      }).then(() => {
+          logout()
+      })
     };
     const gotoPath = (path: string) => {
       router.push(path);
