@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete,UploadedFile,UseInterceptors,UseGuards,Req } from '@nestjs/common';
 import { UserService } from './user.service';
-import type { UserRegister, UserLogin ,Token,TokenPayload} from '@en/common/user/index.ts'
+import type { UserRegister, UserLogin ,Token,TokenPayload,UserUpdate} from '@en/common/user/index.ts'
+import { FileInterceptor,  } from '@nestjs/platform-express';
 
 @Controller('user')
 export class UserController {
@@ -27,18 +28,15 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.userService.findOne(+id);
-  // }
+  //上传头像
+  @Post('upload-avatar')
+  @UseInterceptors(FileInterceptor('file')) //限制前端的key必须是file
+  uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+    return this.userService.uploadAvatar(file);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.userService.update(+id, updateUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.userService.remove(+id);
-  // }
+  @Post('update-user')
+  updateUser(@Body() updateUserDto) {
+    return this.userService.updateUser(updateUserDto);
+  }
 }
